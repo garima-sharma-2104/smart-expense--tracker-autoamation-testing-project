@@ -1,0 +1,56 @@
+erDiagram
+    USER ||--o{ EXPENSE : "owns (user)"
+    USER ||--o{ INCOME : "owns (user)"
+    USER ||--o{ GROUP : "creates (createdBy)"
+    USER }o--o{ GROUP : "member of (members[])"
+    GROUP ||--o{ GROUP_EXPENSE : "has (group)"
+    USER ||--o{ GROUP_EXPENSE : "paid (paidBy)"
+    USER }o--o{ GROUP_EXPENSE : "shares (participants[])"
+
+    USER {
+        ObjectId _id PK
+        string name "max 50"
+        string email "unique, lowercase"
+        string password "bcrypt hash, min 6 chars"
+        number monthlyBudget "default 0, min 0"
+        date createdAt
+        date updatedAt
+    }
+    EXPENSE {
+        ObjectId _id PK
+        ObjectId user FK
+        string title "max 100"
+        number amount "validated > 0 by API"
+        string category "enum, default Other"
+        date date "default now"
+        string description "max 500"
+        boolean isRecurring
+        string recurrenceInterval "Weekly Monthly Yearly None"
+        date nextDueDate
+    }
+    INCOME {
+        ObjectId _id PK
+        ObjectId user FK
+        string source "max 100"
+        number amount "validated > 0 by API"
+        string category "enum, default Other"
+        date date
+        string description "max 500"
+    }
+    GROUP {
+        ObjectId _id PK
+        string name "max 100"
+        ObjectId createdBy FK
+        ObjectId[] members FK
+    }
+    GROUP_EXPENSE {
+        ObjectId _id PK
+        string title
+        number amount "validated > 0 by API"
+        string category
+        date date
+        string description
+        ObjectId group FK
+        ObjectId paidBy FK
+        ObjectId[] participants FK
+    }

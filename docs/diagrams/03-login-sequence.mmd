@@ -1,0 +1,24 @@
+sequenceDiagram
+    actor U as User
+    participant L as Login page (React)
+    participant A as AuthContext
+    participant S as Express API
+    participant D as MongoDB
+    U->>L: enter e-mail + password, submit
+    L->>A: login(email, password)
+    A->>S: POST /api/auth/login
+    S->>S: validate input (strings, required)
+    S->>D: findOne({email}) incl. password hash
+    D-->>S: user or null
+    alt unknown e-mail or bcrypt compare fails
+        S-->>A: 401 {success:false, message:"Invalid email or password"}
+        A-->>L: error
+        L-->>U: show alert
+    else credentials valid
+        S->>S: sign JWT {id} with JWT_SECRET (expires JWT_EXPIRE)
+        S-->>A: 200 {success:true, data:{_id,name,email,monthlyBudget,token}}
+        A->>A: store userInfo in localStorage
+        A-->>L: success
+        L-->>U: navigate to /expenses
+    end
+    Note over L,S: Later requests: Axios adds "Authorization: Bearer token".<br/>protect middleware verifies the JWT and loads the user; otherwise 401.<br/>A 401 response clears localStorage and redirects to /login.

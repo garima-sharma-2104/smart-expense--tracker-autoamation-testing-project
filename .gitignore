@@ -1,0 +1,20 @@
+# dependencies and build output
+node_modules/
+dist/
+build/
+coverage/
+# secrets / local configuration (placeholders live in *.example files)
+.env
+.env.*
+!.env.example
+!.env.test.example
+# logs, temp and OS files
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+# Selenium / Maven generated output (reports, screenshots, compiled classes)
+automation-tests/target/
+# editor
+.idea/
+*.iml

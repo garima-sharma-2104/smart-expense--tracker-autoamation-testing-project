@@ -1,0 +1,30 @@
+sequenceDiagram
+    actor U as User
+    participant F as AddExpense page (React)
+    participant X as Axios (api.js)
+    participant P as protect middleware
+    participant C as expenseController.addExpense
+    participant V as validators.validateEntry
+    participant D as MongoDB (Expense)
+    U->>F: fill title, amount, category, date, submit
+    F->>X: POST /api/expenses {title, amount, category, date, ...}
+    X->>P: Authorization: Bearer token
+    P->>P: verify JWT, load user
+    alt token missing or invalid
+        P-->>F: 401 {success:false, message}
+        F-->>U: redirected to /login
+    else authenticated
+        P->>C: req.user set
+        C->>V: validate + whitelist fields
+        alt invalid (missing title, amount <= 0, bad category/date ...)
+            V-->>C: errors[]
+            C-->>F: 400 {success:false, message}
+            F-->>U: error toast shown
+        else valid
+            C->>C: add user = req.user._id, nextDueDate if recurring
+            C->>D: Expense.create(data)
+            D-->>C: saved document
+            C-->>F: 201 {success:true, data}
+            F-->>U: success toast, navigate to /expenses
+        end
+    end

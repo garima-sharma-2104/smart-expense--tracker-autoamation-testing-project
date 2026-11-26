@@ -1,0 +1,14 @@
+flowchart LR
+    U([End user<br/>web browser])
+    T([QA engineer<br/>Selenium + TestNG])
+    subgraph SET[Smart Expense Tracker]
+        direction LR
+        FE[React SPA<br/>Vite dev server :5173]
+        BE[Express REST API<br/>Node.js :5000]
+        DB[(MongoDB)]
+    end
+    U -->|HTTPS/HTTP| FE
+    FE -->|JSON over HTTP + JWT| BE
+    BE -->|Mongoose| DB
+    T -.->|drives the UI via WebDriver| FE
+    T -.->|seeds test data via REST| BE

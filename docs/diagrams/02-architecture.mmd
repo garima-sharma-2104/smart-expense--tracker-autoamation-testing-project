@@ -1,0 +1,21 @@
+flowchart TB
+    subgraph Client[client/ - React 19 + Vite]
+        Pages[Pages<br/>Login Signup Dashboard Expenses<br/>AddExpense EditExpense Income<br/>Analytics Settings Groups SplitSphere]
+        Ctx[AuthContext + ThemeContext<br/>userInfo in localStorage]
+        Api[utils/api.js<br/>Axios instance<br/>adds Bearer token, handles 401]
+        Pages --> Ctx
+        Pages --> Api
+    end
+    subgraph Server[server/ - Node.js + Express 5]
+        App[app.js<br/>CORS, JSON parser, 404 + error handler]
+        Routes[routes/*<br/>auth, expenses, income, groups]
+        MW[middleware<br/>protect JWT, validateObjectId]
+        Ctl[controllers/*<br/>business logic + ownership checks]
+        Val[utils/validators.js<br/>utils/respond.js]
+        Mdl[models/*<br/>Mongoose schemas]
+        App --> Routes --> MW --> Ctl
+        Ctl --> Val
+        Ctl --> Mdl
+    end
+    Api -->|REST /api/*| App
+    Mdl --> DB[(MongoDB)]
